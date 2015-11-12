@@ -1,0 +1,23 @@
+<?php
+require_once 'lib/twitteroauth.php';
+ 
+define('CONSUMER_KEY', 'your_consumer_key');
+define('CONSUMER_SECRET', 'your_consumer_secret');
+define('ACCESS_TOKEN', 'your_access_token');
+define('ACCESS_TOKEN_SECRET', 'your_access_token_secret');
+ 
+function auto_follow()
+{
+    $toa = new TwitterOAuth(CONSUMER_KEY, CONSUMER_SECRET, ACCESS_TOKEN, ACCESS_TOKEN_SECRET);
+ 
+    $followers = $toa->get('followers/ids', array('cursor' => -1));
+    $friends = $toa->get('friends/ids', array('cursor' => -1));
+ 
+    foreach ($followers->ids as $i => $id) {
+        if (empty($friends->ids) or !in_array($id, $friends->ids)) {
+            $ret = $toa->post('friendships/create', array('user_id' => $id));
+        }
+    }
+}
+ 
+auto_follow();
